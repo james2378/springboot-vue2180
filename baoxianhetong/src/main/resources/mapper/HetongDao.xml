@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HetongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.kehu_id as kehuId
+        ,a.hetong_uuid_number as hetongUuidNumber
+        ,a.hetong_types as hetongTypes
+        ,a.changduan_types as changduanTypes
+        ,a.hetong_file as hetongFile
+        ,a.baofei_double as baofeiDouble
+        ,a.baoe_double as baoeDouble
+        ,a.shouyiren_name as shouyirenName
+        ,a.shouyiren_phone as shouyirenPhone
+        ,a.shouyiren_id_number as shouyirenIdNumber
+        ,a.shouyiren_address as shouyirenAddress
+        ,a.hetong_content as hetongContent
+        ,a.zhixing_time as zhixingTime
+        ,a.daoqi_time as daoqiTime
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.HetongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,kehu.kehu_name as kehuName
+        ,kehu.kehu_phone as kehuPhone
+        ,kehu.kehu_id_number as kehuIdNumber
+        ,kehu.kehu_photo as kehuPhoto
+        ,kehu.sex_types as sexTypes
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM hetong  a
+        left JOIN kehu kehu ON a.kehu_id = kehu.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.kehuId != null and params.kehuId != ''">
+                and a.kehu_id = #{params.kehuId}
+            </if>
+            <if test=" params.hetongUuidNumber != '' and params.hetongUuidNumber != null and params.hetongUuidNumber != 'null' ">
+                and a.hetong_uuid_number like CONCAT('%',#{params.hetongUuidNumber},'%')
+            </if>
+            <if test="params.hetongTypes != null and params.hetongTypes != ''">
+                and a.hetong_types = #{params.hetongTypes}
+            </if>
+            <if test="params.changduanTypes != null and params.changduanTypes != ''">
+                and a.changduan_types = #{params.changduanTypes}
+            </if>
+            <if test="params.baofeiDoubleStart != null ">
+                <![CDATA[  and a.baofei_double >= #{params.baofeiDoubleStart}   ]]>
+            </if>
+            <if test="params.baofeiDoubleEnd != null ">
+                <![CDATA[  and a.baofei_double <= #{params.baofeiDoubleEnd}   ]]>
+            </if>
+            <if test="params.baoeDoubleStart != null ">
+                <![CDATA[  and a.baoe_double >= #{params.baoeDoubleStart}   ]]>
+            </if>
+            <if test="params.baoeDoubleEnd != null ">
+                <![CDATA[  and a.baoe_double <= #{params.baoeDoubleEnd}   ]]>
+            </if>
+            <if test=" params.shouyirenName != '' and params.shouyirenName != null and params.shouyirenName != 'null' ">
+                and a.shouyiren_name like CONCAT('%',#{params.shouyirenName},'%')
+            </if>
+            <if test=" params.shouyirenPhone != '' and params.shouyirenPhone != null and params.shouyirenPhone != 'null' ">
+                and a.shouyiren_phone like CONCAT('%',#{params.shouyirenPhone},'%')
+            </if>
+            <if test=" params.shouyirenIdNumber != '' and params.shouyirenIdNumber != null and params.shouyirenIdNumber != 'null' ">
+                and a.shouyiren_id_number like CONCAT('%',#{params.shouyirenIdNumber},'%')
+            </if>
+            <if test=" params.shouyirenAddress != '' and params.shouyirenAddress != null and params.shouyirenAddress != 'null' ">
+                and a.shouyiren_address like CONCAT('%',#{params.shouyirenAddress},'%')
+            </if>
+            <if test=" params.hetongContent != '' and params.hetongContent != null and params.hetongContent != 'null' ">
+                and a.hetong_content like CONCAT('%',#{params.hetongContent},'%')
+            </if>
+            <if test=" params.zhixingTimeStart != '' and params.zhixingTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhixing_time) >= UNIX_TIMESTAMP(#{params.zhixingTimeStart}) ]]>
+            </if>
+            <if test=" params.zhixingTimeEnd != '' and params.zhixingTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhixing_time) <= UNIX_TIMESTAMP(#{params.zhixingTimeEnd}) ]]>
+            </if>
+            <if test=" params.daoqiTimeStart != '' and params.daoqiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.daoqi_time) >= UNIX_TIMESTAMP(#{params.daoqiTimeStart}) ]]>
+            </if>
+            <if test=" params.daoqiTimeEnd != '' and params.daoqiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.daoqi_time) <= UNIX_TIMESTAMP(#{params.daoqiTimeEnd}) ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断客户的id不为空 -->
+            <if test=" params.kehuIdNotNull != '' and params.kehuIdNotNull != null and params.kehuIdNotNull != 'null' ">
+                and a.kehu_id IS NOT NULL
+            </if>
+            <if test=" params.kehuName != '' and params.kehuName != null and params.kehuName != 'null' ">
+                and kehu.kehu_name like CONCAT('%',#{params.kehuName},'%')
+            </if>
+            <if test=" params.kehuPhone != '' and params.kehuPhone != null and params.kehuPhone != 'null' ">
+                and kehu.kehu_phone like CONCAT('%',#{params.kehuPhone},'%')
+            </if>
+            <if test=" params.kehuIdNumber != '' and params.kehuIdNumber != null and params.kehuIdNumber != 'null' ">
+                and kehu.kehu_id_number like CONCAT('%',#{params.kehuIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null  and params.sexTypes != ''">
+                and kehu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kehu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kehu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
